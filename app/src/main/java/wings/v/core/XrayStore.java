@@ -34,8 +34,6 @@ public final class XrayStore {
     private static final String DEFAULT_SUBSCRIPTION_URL =
         "https://raw.githubusercontent.com/zieng2/wl/main/vless_universal.txt";
     private static final String DEFAULT_SUBSCRIPTION_TITLE = "Universal";
-    private static final String DEFAULT_REMOTE_DNS = "https://common.dot.dns.yandex.net/dns-query";
-    private static final String DEFAULT_DIRECT_DNS = "https://common.dot.dns.yandex.net/dns-query";
 
     private XrayStore() {}
 
@@ -76,8 +74,9 @@ public final class XrayStore {
             prefs.getString(AppPrefs.KEY_XRAY_LOCAL_PROXY_PORT, String.valueOf(DEFAULT_LOCAL_PROXY_PORT)),
             DEFAULT_LOCAL_PROXY_PORT
         );
-        settings.remoteDns = trim(prefs.getString(AppPrefs.KEY_XRAY_REMOTE_DNS, DEFAULT_REMOTE_DNS));
-        settings.directDns = trim(prefs.getString(AppPrefs.KEY_XRAY_DIRECT_DNS, DEFAULT_DIRECT_DNS));
+        String systemDns = SystemDnsResolver.joinComma(context);
+        settings.remoteDns = systemDns;
+        settings.directDns = systemDns;
         settings.ipv6 = prefs.getBoolean(AppPrefs.KEY_XRAY_IPV6_ENABLED, true);
         settings.sniffingEnabled = prefs.getBoolean(AppPrefs.KEY_XRAY_SNIFFING_ENABLED, true);
         settings.proxyQuicEnabled = prefs.getBoolean(AppPrefs.KEY_XRAY_PROXY_QUIC_ENABLED, false);
@@ -105,14 +104,8 @@ public final class XrayStore {
                 AppPrefs.KEY_XRAY_LOCAL_PROXY_PORT,
                 String.valueOf(value.localProxyPort > 0 ? value.localProxyPort : DEFAULT_LOCAL_PROXY_PORT)
             )
-            .putString(
-                AppPrefs.KEY_XRAY_REMOTE_DNS,
-                TextUtils.isEmpty(trim(value.remoteDns)) ? DEFAULT_REMOTE_DNS : trim(value.remoteDns)
-            )
-            .putString(
-                AppPrefs.KEY_XRAY_DIRECT_DNS,
-                TextUtils.isEmpty(trim(value.directDns)) ? DEFAULT_DIRECT_DNS : trim(value.directDns)
-            )
+            .putString(AppPrefs.KEY_XRAY_REMOTE_DNS, SystemDnsResolver.joinComma(context))
+            .putString(AppPrefs.KEY_XRAY_DIRECT_DNS, SystemDnsResolver.joinComma(context))
             .putBoolean(AppPrefs.KEY_XRAY_IPV6_ENABLED, value.ipv6)
             .putBoolean(AppPrefs.KEY_XRAY_SNIFFING_ENABLED, value.sniffingEnabled)
             .putBoolean(AppPrefs.KEY_XRAY_PROXY_QUIC_ENABLED, value.proxyQuicEnabled)

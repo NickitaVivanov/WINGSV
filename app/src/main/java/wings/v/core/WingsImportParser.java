@@ -46,7 +46,7 @@ public final class WingsImportParser {
     private static final boolean DEFAULT_NO_OBFUSCATION = false;
     private static final String DEFAULT_SESSION_MODE = "auto";
     private static final String DEFAULT_LOCAL_ENDPOINT = "127.0.0.1:9000";
-    private static final String DEFAULT_WG_DNS = "1.1.1.1, 1.0.0.1";
+    private static final String DEFAULT_WG_DNS = "";
     private static final int DEFAULT_WG_MTU = 1280;
     private static final String DEFAULT_ALLOWED_IPS = "0.0.0.0/0, ::/0";
     private static final int DEFAULT_SUBSCRIPTION_REFRESH_MINUTES = 24 * 60;
@@ -2685,8 +2685,8 @@ public final class WingsImportParser {
         settings.allowLan = false;
         settings.allowInsecure = false;
         settings.localProxyPort = 10808;
-        settings.remoteDns = "https://common.dot.dns.yandex.net/dns-query";
-        settings.directDns = "https://common.dot.dns.yandex.net/dns-query";
+        settings.remoteDns = "";
+        settings.directDns = "";
         settings.ipv6 = true;
         settings.sniffingEnabled = true;
         settings.proxyQuicEnabled = false;

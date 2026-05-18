@@ -94,12 +94,14 @@
         android:key="pref_dns_mode"
         android:title="@string/dns_mode_title"
         android:summary="@string/dns_mode_summary"
-        android:defaultValue="auto"
+        android:defaultValue="system"
+        android:enabled="false"
         android:entries="@array/dns_mode_entries"
         android:entryValues="@array/dns_mode_values" />
 
     <EditTextPreference
         android:key="pref_vk_turn_user_dns"
+        android:visible="false"
         android:title="@string/vk_turn_user_dns_title"
         android:summary="@string/vk_turn_user_dns_summary"
         android:dialogTitle="@string/vk_turn_user_dns_title"
@@ -293,7 +295,8 @@
     <EditTextPreference
         android:key="pref_wg_dns"
         android:title="DNS"
-        android:defaultValue="1.1.1.1, 1.0.0.1"
+        android:defaultValue=""
+        android:enabled="false"
         app:useSimpleSummaryProvider="true" />
 
     <EditTextPreference

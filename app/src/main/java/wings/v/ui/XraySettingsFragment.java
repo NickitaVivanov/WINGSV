@@ -21,6 +21,7 @@ import wings.v.core.BackendType;
 import wings.v.core.Haptics;
 import wings.v.core.ProxyRuntimeMode;
 import wings.v.core.SocksAuthSecurity;
+import wings.v.core.SystemDnsResolver;
 import wings.v.core.XraySettings;
 import wings.v.core.XrayStore;
 import wings.v.core.XrayTransportMode;
@@ -39,8 +40,6 @@ public class XraySettingsFragment extends PreferenceFragmentCompat {
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_LOCAL_PROXY_USERNAME);
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_LOCAL_PROXY_PASSWORD);
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_LOCAL_PROXY_PORT);
-        RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_REMOTE_DNS);
-        RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_DIRECT_DNS);
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_IPV6_ENABLED);
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_SNIFFING_ENABLED);
         RUNTIME_AFFECTING_KEYS.add(AppPrefs.KEY_XRAY_PROXY_QUIC_ENABLED);
@@ -80,8 +79,6 @@ public class XraySettingsFragment extends PreferenceFragmentCompat {
         bindRuntimeMode(AppPrefs.KEY_XRAY_RUNTIME_MODE);
         bindTransportMode(AppPrefs.KEY_XRAY_TRANSPORT_MODE);
         bindRoutingEntry();
-        bindSummary(AppPrefs.KEY_XRAY_REMOTE_DNS);
-        bindSummary(AppPrefs.KEY_XRAY_DIRECT_DNS);
         bindSummary(AppPrefs.KEY_XRAY_LOCAL_PROXY_USERNAME);
         bindSummary(AppPrefs.KEY_XRAY_LOCAL_PROXY_PASSWORD);
         bindNumeric(AppPrefs.KEY_XRAY_LOCAL_PROXY_PORT);
@@ -168,8 +165,8 @@ public class XraySettingsFragment extends PreferenceFragmentCompat {
 
     private void syncFromStore() {
         XraySettings settings = XrayStore.getXraySettings(requireContext());
-        syncEditText(AppPrefs.KEY_XRAY_REMOTE_DNS, settings.remoteDns);
-        syncEditText(AppPrefs.KEY_XRAY_DIRECT_DNS, settings.directDns);
+        syncSystemDnsSummary(AppPrefs.KEY_XRAY_REMOTE_DNS);
+        syncSystemDnsSummary(AppPrefs.KEY_XRAY_DIRECT_DNS);
         syncEditText(AppPrefs.KEY_XRAY_LOCAL_PROXY_PORT, String.valueOf(settings.localProxyPort));
         syncEditText(AppPrefs.KEY_XRAY_LOCAL_PROXY_USERNAME, settings.localProxyUsername);
         syncEditText(AppPrefs.KEY_XRAY_LOCAL_PROXY_PASSWORD, settings.localProxyPassword);
@@ -198,6 +195,19 @@ public class XraySettingsFragment extends PreferenceFragmentCompat {
         Preference preference = findPreference(AppPrefs.KEY_XRAY_TRANSPORT_MODE);
         if (preference != null) {
             preference.setVisible(true);
+        }
+    }
+
+    private void syncSystemDnsSummary(String key) {
+        Preference preference = findPreference(key);
+        if (preference == null) {
+            return;
+        }
+        String systemDns = SystemDnsResolver.joinComma(requireContext());
+        if (TextUtils.isEmpty(systemDns)) {
+            preference.setSummary(R.string.xray_settings_dns_system_unavailable);
+        } else {
+            preference.setSummary(getString(R.string.xray_settings_dns_system_summary, systemDns));
         }
     }
 

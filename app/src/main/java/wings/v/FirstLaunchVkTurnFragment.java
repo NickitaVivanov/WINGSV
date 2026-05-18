@@ -36,6 +36,7 @@ import wings.v.core.AppPrefs;
 import wings.v.core.BackendType;
 import wings.v.core.Haptics;
 import wings.v.core.ProxySettings;
+import wings.v.core.SystemDnsResolver;
 import wings.v.core.WingsImportParser;
 import wings.v.databinding.FragmentFirstLaunchVkTurnBinding;
 import wings.v.service.ProxyTunnelService;
@@ -345,7 +346,7 @@ public class FirstLaunchVkTurnFragment extends Fragment {
         }
         setText(AppPrefs.KEY_WG_PRIVATE_KEY, settings.wgPrivateKey);
         setText(AppPrefs.KEY_WG_ADDRESSES, settings.wgAddresses);
-        setText(AppPrefs.KEY_WG_DNS, TextUtils.isEmpty(settings.wgDns) ? "1.1.1.1, 1.0.0.1" : settings.wgDns);
+        setText(AppPrefs.KEY_WG_DNS, SystemDnsResolver.joinComma(requireContext()));
         setText(AppPrefs.KEY_WG_MTU, String.valueOf(settings.wgMtu > 0 ? settings.wgMtu : 1280));
         setText(AppPrefs.KEY_WG_PUBLIC_KEY, settings.wgPublicKey);
         setText(AppPrefs.KEY_WG_PRESHARED_KEY, settings.wgPresharedKey);

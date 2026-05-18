@@ -897,10 +897,13 @@
     <string name="theme_mode_light">Светлая</string>
     <string name="theme_mode_light_summary">Всегда использовать светлое оформление приложения</string>
     <string name="dns_mode_title">DNS resolver</string>
-    <string name="dns_mode_summary">Влияет на VK TURN и WB Stream</string>
+    <string name="dns_mode_summary">Используются только DNS-серверы активной сети устройства</string>
+    <string name="dns_mode_system">Системный DNS устройства</string>
     <string name="dns_mode_auto">Авто (UDP → DoH fallback)</string>
     <string name="dns_mode_udp">Только UDP/53</string>
     <string name="dns_mode_doh">Только DNS-over-HTTPS</string>
+    <string name="xray_settings_dns_system_summary">DNS активной сети устройства: %1$s</string>
+    <string name="xray_settings_dns_system_unavailable">DNS активной сети устройства недоступен</string>
     <string name="guardian_settings_title">Попечительство</string>
     <string name="guardian_settings_short_summary">Удалённое управление настройками и тунелем через панель</string>
     <string name="guardian_settings_summary_not_configured">Не настроено</string>

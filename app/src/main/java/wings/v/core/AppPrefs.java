@@ -176,8 +176,12 @@ public final class AppPrefs {
     public static final String THEME_MODE_SYSTEM = "system";
     public static final String THEME_MODE_DARK = "dark";
     public static final String THEME_MODE_LIGHT = "light";
+    public static final String DNS_MODE_SYSTEM = "system";
+    /** @deprecated Kept for preference migration only. */
     public static final String DNS_MODE_AUTO = "auto";
+    /** @deprecated Kept for preference migration only. */
     public static final String DNS_MODE_UDP = "udp";
+    /** @deprecated Kept for preference migration only. */
     public static final String DNS_MODE_DOH = "doh";
     public static final String KEY_DNS_MODE = "pref_dns_mode";
     public static final String KEY_GUARDIAN_ENABLED = "pref_guardian_enabled";
@@ -302,7 +306,7 @@ public final class AppPrefs {
     }
 
     public static String getDnsMode(Context context) {
-        return normalizeDnsMode(prefs(context).getString(KEY_DNS_MODE, DNS_MODE_AUTO));
+        return normalizeDnsMode(prefs(context).getString(KEY_DNS_MODE, DNS_MODE_SYSTEM));
     }
 
     public static void setDnsMode(Context context, String value) {
@@ -311,10 +315,10 @@ public final class AppPrefs {
 
     public static String normalizeDnsMode(String value) {
         String normalized = value == null ? "" : value.trim().toLowerCase(java.util.Locale.ROOT);
-        if (DNS_MODE_UDP.equals(normalized) || DNS_MODE_DOH.equals(normalized)) {
-            return normalized;
+        if (DNS_MODE_SYSTEM.equals(normalized)) {
+            return DNS_MODE_SYSTEM;
         }
-        return DNS_MODE_AUTO;
+        return DNS_MODE_SYSTEM;
     }
 
     public static boolean isGuardianEnabled(Context context) {
@@ -957,14 +961,14 @@ public final class AppPrefs {
         settings.vkTurnRuntimeMode = ProxyRuntimeMode.fromPrefValue(
             prefs.getString(KEY_VK_TURN_RUNTIME_MODE, ProxyRuntimeMode.VPN.prefValue)
         );
-        settings.vkTurnUserDns = trim(prefs.getString(KEY_VK_TURN_USER_DNS, ""));
+        settings.vkTurnUserDns = "";
         settings.turnSessionMode = normalizeTurnSessionMode(prefs.getString(KEY_TURN_SESSION_MODE, "mainline"));
         settings.localEndpoint = trim(prefs.getString(KEY_LOCAL_ENDPOINT, "127.0.0.1:9000"));
         settings.turnHost = trim(prefs.getString(KEY_TURN_HOST, ""));
         settings.turnPort = trim(prefs.getString(KEY_TURN_PORT, ""));
         settings.wgPrivateKey = trim(prefs.getString(KEY_WG_PRIVATE_KEY, ""));
         settings.wgAddresses = trim(prefs.getString(KEY_WG_ADDRESSES, ""));
-        settings.wgDns = trim(prefs.getString(KEY_WG_DNS, "1.1.1.1, 1.0.0.1"));
+        settings.wgDns = SystemDnsResolver.joinComma(context);
         settings.wgMtu = parseInt(prefs.getString(KEY_WG_MTU, "1280"), 1280);
         settings.wgPublicKey = trim(prefs.getString(KEY_WG_PUBLIC_KEY, ""));
         settings.wgPresharedKey = trim(prefs.getString(KEY_WG_PRESHARED_KEY, ""));
@@ -1003,7 +1007,7 @@ public final class AppPrefs {
             applyImportedTurnSettings(editor, importedConfig, backendType);
         }
         if (importedConfig.hasWireGuardSettings) {
-            applyImportedWireGuardSettings(editor, importedConfig, backendType);
+            applyImportedWireGuardSettings(context, editor, importedConfig, backendType);
         }
         if (importedConfig.hasWbStreamSettings) {
             editor.putString(KEY_WB_STREAM_ROOM_ID, trim(importedConfig.wbStreamRoomId));
@@ -1146,6 +1150,7 @@ public final class AppPrefs {
     }
 
     private static void applyImportedWireGuardSettings(
+        Context context,
         SharedPreferences.Editor editor,
         WingsImportParser.ImportedConfig importedConfig,
         BackendType backendType
@@ -1159,7 +1164,7 @@ public final class AppPrefs {
         editor.putString(KEY_WG_ADDRESSES, trim(importedConfig.wgAddresses));
         editor.putString(
             KEY_WG_DNS,
-            TextUtils.isEmpty(trim(importedConfig.wgDns)) ? "1.1.1.1, 1.0.0.1" : trim(importedConfig.wgDns)
+            SystemDnsResolver.joinComma(context)
         );
         editor.putString(
             KEY_WG_MTU,
@@ -1479,7 +1484,7 @@ public final class AppPrefs {
             .putString(KEY_TURN_PORT, trim(settings.turnPort))
             .putString(KEY_WG_PRIVATE_KEY, trim(settings.wgPrivateKey))
             .putString(KEY_WG_ADDRESSES, trim(settings.wgAddresses))
-            .putString(KEY_WG_DNS, TextUtils.isEmpty(trim(settings.wgDns)) ? "1.1.1.1, 1.0.0.1" : trim(settings.wgDns))
+            .putString(KEY_WG_DNS, SystemDnsResolver.joinComma(context))
             .putString(KEY_WG_MTU, String.valueOf(settings.wgMtu > 0 ? settings.wgMtu : 1280))
             .putString(KEY_WG_PUBLIC_KEY, trim(settings.wgPublicKey))
             .putString(KEY_WG_PRESHARED_KEY, trim(settings.wgPresharedKey))

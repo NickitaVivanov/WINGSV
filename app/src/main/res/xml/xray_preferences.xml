@@ -67,17 +67,15 @@
     <PreferenceCategory
         android:title="@string/xray_settings_dns_category" />
 
-    <EditTextPreference
+    <Preference
         android:key="pref_xray_remote_dns"
         android:title="@string/xray_settings_remote_dns_title"
-        android:defaultValue="https://common.dot.dns.yandex.net/dns-query"
-        app:useSimpleSummaryProvider="true" />
+        android:selectable="false" />
 
-    <EditTextPreference
+    <Preference
         android:key="pref_xray_direct_dns"
         android:title="@string/xray_settings_direct_dns_title"
-        android:defaultValue="https://common.dot.dns.yandex.net/dns-query"
-        app:useSimpleSummaryProvider="true" />
+        android:selectable="false" />
 
     <dev.oneuiproject.oneui.preference.InsetPreferenceCategory />
 

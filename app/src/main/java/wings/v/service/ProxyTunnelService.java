@@ -92,6 +92,7 @@ import wings.v.core.ActiveProbingManager;
 import wings.v.core.AmneziaConfigFactory;
 import wings.v.core.AmneziaStore;
 import wings.v.core.AppPrefs;
+import wings.v.core.SystemDnsResolver;
 import wings.v.core.BackendType;
 import wings.v.core.ByeDpiSettings;
 import wings.v.core.CaptchaPromptSource;
@@ -1525,6 +1526,7 @@ public class ProxyTunnelService extends Service {
     }
 
     private void startXrayRuntime(ProxySettings settings, int generation) throws Exception {
+        SystemDnsResolver.requireJoinComma(getApplicationContext());
         ensureRuntimeStillWanted(generation);
         clearPersistedRootRuntimeState();
         AppPrefs.clearRuntimeUpstreamState(getApplicationContext());
@@ -2748,19 +2750,12 @@ public class ProxyTunnelService extends Service {
         throw new IllegalStateException(firstNonEmpty(launchError, "Не удалось запустить proxy"));
     }
 
-    /** Передаём собственные DNS-резолверы юзера в vk-turn-proxy через
-     *  -user-dns. Прокси сам парсит формат и prepend'ит их к встроенному
-     *  списку (yandex → google → cloudflare). */
-    private static void appendUserDnsArg(List<String> command, @Nullable ProxySettings settings) {
-        if (settings == null || TextUtils.isEmpty(settings.vkTurnUserDns)) {
-            return;
-        }
-        String trimmed = settings.vkTurnUserDns.trim();
-        if (trimmed.isEmpty()) {
-            return;
-        }
-        command.add("-user-dns");
-        command.add(trimmed);
+    private void appendSystemDnsArgs(List<String> command) {
+        String systemDns = SystemDnsResolver.requireJoinComma(getApplicationContext());
+        command.add("-dns");
+        command.add(AppPrefs.DNS_MODE_SYSTEM);
+        command.add("-system-dns");
+        command.add(systemDns);
     }
 
     private static String joinVkLinks(ProxySettings settings) {
@@ -2798,9 +2793,7 @@ public class ProxyTunnelService extends Service {
 
         List<String> command = new ArrayList<>();
         command.add(executable.getAbsolutePath());
-        command.add("-dns");
-        command.add(AppPrefs.getDnsMode(getApplicationContext()));
-        appendUserDnsArg(command, settings);
+        appendSystemDnsArgs(command);
         command.add("-peer");
         command.add(settings.endpoint);
         command.add("-vk-link");
@@ -2953,9 +2946,7 @@ public class ProxyTunnelService extends Service {
 
         List<String> command = new ArrayList<>();
         command.add(executable.getAbsolutePath());
-        command.add("-dns");
-        command.add(AppPrefs.getDnsMode(appContext));
-        appendUserDnsArg(command, settings);
+        appendSystemDnsArgs(command);
         if (roomIds.size() > 1) {
             command.add("-wb-stream-room-ids");
             command.add(TextUtils.join(",", roomIds));
@@ -3002,9 +2993,7 @@ public class ProxyTunnelService extends Service {
         }
         List<String> command = new ArrayList<>();
         command.add(executable.getAbsolutePath());
-        command.add("-dns");
-        command.add(AppPrefs.getDnsMode(getApplicationContext()));
-        appendUserDnsArg(command, settings);
+        appendSystemDnsArgs(command);
         command.add("-room-exchange-mode");
         command.add("-peer");
         command.add(settings.endpoint);
@@ -5112,13 +5101,7 @@ public class ProxyTunnelService extends Service {
     private VpnHotspotSharingConfig buildSharingConfig() {
         ProxySettings settings = AppPrefs.getSettings(getApplicationContext());
         String upstreamInterface = AppPrefs.getSharingUpstreamInterface(getApplicationContext());
-        String explicitDnsServers = settings != null ? settings.wgDns : "";
-
-        if (usesXrayBackend(activeBackendType)) {
-            explicitDnsServers = buildXrayExplicitDnsServers(settings);
-        } else if (usesAmneziaBackend(activeBackendType)) {
-            explicitDnsServers = AmneziaStore.getConfiguredDns(getApplicationContext());
-        }
+        String explicitDnsServers = SystemDnsResolver.joinComma(getApplicationContext());
 
         if (TextUtils.isEmpty(upstreamInterface)) {
             if (activeXrayTproxyMode) {
@@ -5182,22 +5165,6 @@ public class ProxyTunnelService extends Service {
             rootModeActive &&
             !kernelWireguardActive
         );
-    }
-
-    private String buildXrayExplicitDnsServers(@Nullable ProxySettings settings) {
-        if (settings == null || settings.xraySettings == null) {
-            return "";
-        }
-        LinkedHashSet<String> dnsServers = new LinkedHashSet<>();
-        String remoteDns = settings.xraySettings.remoteDns;
-        String directDns = settings.xraySettings.directDns;
-        if (!TextUtils.isEmpty(remoteDns)) {
-            dnsServers.add(remoteDns.trim());
-        }
-        if (!TextUtils.isEmpty(directDns)) {
-            dnsServers.add(directDns.trim());
-        }
-        return TextUtils.join(", ", dnsServers);
     }
 
     @Nullable

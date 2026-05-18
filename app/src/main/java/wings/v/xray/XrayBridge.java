@@ -313,7 +313,7 @@ public final class XrayBridge {
         if (!TextUtils.isEmpty(candidate)) {
             return candidate;
         }
-        return "1.1.1.1:53";
+        return "";
     }
 
     private static String normalizePlainDnsDialTarget(String value) {
