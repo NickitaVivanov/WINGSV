@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 import libXray.DialerController;
 import wings.v.MainActivity;
 import wings.v.core.AppPrefs;
-import wings.v.core.SystemDnsResolver;
 import wings.v.core.ProxySettings;
+import wings.v.core.SystemDnsResolver;
 import wings.v.core.XraySettings;
 import wings.v.xray.XrayBridge;
 
@@ -284,7 +284,7 @@ public class XrayVpnService extends VpnService implements DialerController {
                 builder.addRoute("::", 0);
             }
 
-            addDnsServers(builder, value);
+            addDnsServers(builder);
             applyAppRouting(builder);
 
             Intent configureIntent = new Intent(this, MainActivity.class).addFlags(
@@ -366,7 +366,7 @@ public class XrayVpnService extends VpnService implements DialerController {
         }
     }
 
-    private void addDnsServers(Builder builder, ProxySettings settings) {
+    private void addDnsServers(Builder builder) {
         for (String server : SystemDnsResolver.getServers(this)) {
             addDnsServer(builder, server);
         }

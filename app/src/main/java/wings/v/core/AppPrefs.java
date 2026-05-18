@@ -314,10 +314,6 @@ public final class AppPrefs {
     }
 
     public static String normalizeDnsMode(String value) {
-        String normalized = value == null ? "" : value.trim().toLowerCase(java.util.Locale.ROOT);
-        if (DNS_MODE_SYSTEM.equals(normalized)) {
-            return DNS_MODE_SYSTEM;
-        }
         return DNS_MODE_SYSTEM;
     }
 
@@ -1162,10 +1158,7 @@ public final class AppPrefs {
         editor.putString(KEY_WG_ENDPOINT, wireGuardEndpoint);
         editor.putString(KEY_WG_PRIVATE_KEY, trim(importedConfig.wgPrivateKey));
         editor.putString(KEY_WG_ADDRESSES, trim(importedConfig.wgAddresses));
-        editor.putString(
-            KEY_WG_DNS,
-            SystemDnsResolver.joinComma(context)
-        );
+        editor.putString(KEY_WG_DNS, SystemDnsResolver.joinComma(context));
         editor.putString(
             KEY_WG_MTU,
             String.valueOf(importedConfig.wgMtu != null && importedConfig.wgMtu > 0 ? importedConfig.wgMtu : 1280)

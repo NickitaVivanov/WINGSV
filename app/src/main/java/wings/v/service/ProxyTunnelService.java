@@ -92,7 +92,6 @@ import wings.v.core.ActiveProbingManager;
 import wings.v.core.AmneziaConfigFactory;
 import wings.v.core.AmneziaStore;
 import wings.v.core.AppPrefs;
-import wings.v.core.SystemDnsResolver;
 import wings.v.core.BackendType;
 import wings.v.core.ByeDpiSettings;
 import wings.v.core.CaptchaPromptSource;
@@ -100,6 +99,7 @@ import wings.v.core.ProxySettings;
 import wings.v.core.PublicIpFetcher;
 import wings.v.core.RootMultiUserRouter;
 import wings.v.core.RootUtils;
+import wings.v.core.SystemDnsResolver;
 import wings.v.core.TetherType;
 import wings.v.core.UiFormatter;
 import wings.v.core.WireGuardConfigFactory;
@@ -5099,7 +5099,6 @@ public class ProxyTunnelService extends Service {
     }
 
     private VpnHotspotSharingConfig buildSharingConfig() {
-        ProxySettings settings = AppPrefs.getSettings(getApplicationContext());
         String upstreamInterface = AppPrefs.getSharingUpstreamInterface(getApplicationContext());
         String explicitDnsServers = SystemDnsResolver.joinComma(getApplicationContext());
 
