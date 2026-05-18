@@ -56,6 +56,13 @@
 - `seslUser`
 - `seslToken`
 
+Для GitHub Actions в настройках репозитория (**Settings → Secrets and variables → Actions**) добавьте:
+
+- `SESL_USER` — GitHub username
+- `SESL_TOKEN` — personal access token с правом `read:packages`
+
+Без этих секретов CI не сможет скачать `sesl.androidx.*` и `io.github.tribalfs:oneui-design` (Gradle будет ошибочно ходить в JitPack и получать 400).
+
 ```bash
 # Сразу склонить с submodules
 git clone --recurse-submodules https://github.com/WINGS-N/WINGSV.git

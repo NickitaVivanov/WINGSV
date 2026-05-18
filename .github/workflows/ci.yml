@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   build-debug:
@@ -117,6 +118,19 @@ jobs:
 
       - name: Run Java lint
         run: pnpm lint:java
+
+      - name: Verify SESL GitHub Packages credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${ORG_GRADLE_PROJECT_seslUser:-}" || -z "${ORG_GRADLE_PROJECT_seslToken:-}" ]]; then
+            echo "::error::Missing SESL_USER / SESL_TOKEN repository secrets." >&2
+            echo "WINGSV resolves OneUI/SESL artifacts from tribalfs GitHub Packages (not JitPack/Maven Central)." >&2
+            echo "Add Actions secrets: SESL_USER (GitHub username) and SESL_TOKEN (PAT with read:packages)." >&2
+            echo "See README.md (section \"Сборка\")." >&2
+            echo "Fork pull requests cannot use repository secrets; push to a branch in this repo instead." >&2
+            exit 1
+          fi
 
       - name: Resolve build version
         id: resolve-version
